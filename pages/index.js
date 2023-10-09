@@ -150,7 +150,7 @@ async function signContract(fileUrl, signerEmailAddress, initiatorEmailAddress) 
 
 function SignContractButton({ fileUrl, initiatorEmail, signerEmail }) { 
   return (
-      <button onClick={() => signContract(fileUrl, initiatorEmail, signerEmail)} >
+      <button className={styles.button} onClick={() => signContract(fileUrl, initiatorEmail, signerEmail)} >
           Sign contract
       </button>
   );
@@ -191,7 +191,6 @@ function SignContractButton({ fileUrl, initiatorEmail, signerEmail }) {
             </div>
             <br />
               <SignContractButton fileUrl={link} initiatorEmail={initiatorEmail} signerEmail={signerEmail}/>
-
             </>
           )}
       {loading && (
