@@ -1,131 +1,204 @@
-import Head from 'next/head';
 import styles from '../styles/Home.module.css';
+import { Header } from '../components/Header';
+import { Footer } from '../components/Footer';
+import { UploadDropzone } from '@bytescale/upload-widget-react';
+import * as pdfjsLib from 'pdfjs-dist';
+import scan from "../utils/scan"
+import { useEffect, useState } from 'react';
+
+
 
 export default function Home() {
+  const [advice, setAdvice] = useState("")
+  const [loading, setLoading] = useState(false);
+  const [signerEmail, setSignerEmail] = useState("");
+  const [link, setLink] = useState("")
+  const [initiatorEmail, setInitiatorEmail] = useState("");
+
+
+async function fetchText(url) {
+  try {
+      const response = await fetch(url);
+      if (!response.ok) {
+          throw new Error('Network response was not ok' + response.statusText);
+      }
+      const text = await response.text();
+      return text;
+  } catch (error) {
+      console.error('There has been a problem with your fetch operation:', error);
+      throw error;
+  }
+}
+
+async function getPdfText(url) {
+  try {
+      setLoading(true)
+      const pdf = await pdfjsLib.getDocument(url).promise;
+      let textContent = '';
+      for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const text = await page.getTextContent();
+          text.items.forEach(item => {
+              textContent += item.str + ' ';
+          });
+      }
+            const scanResult = await scan(textContent)
+              setAdvice(scanResult)
+              setLoading(false)
+               setLink(url)
+              console.log("link", link)
+            console.log(scanResult)
+      return textContent;
+  } catch (error) {
+      console.error('Error:', error);
+      throw error;
+  }
+}
+
+
+function AudioUploader() {
+  const options = {
+    apiKey: process.env.NEXT_PUBLIC_UPLOAD || "free",
+    maxFileCount: 1,
+    mimeTypes: ["application/pdf", "text/plain"],
+    styles: { colors: { primary: "#000" } },
+  };
+
+  useEffect(() => {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.js`;
+  }, [])
+
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing <code>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel" className={styles.logo} />
-        </a>
-      </footer>
-
-      <style jsx>{`
-        main {
-          padding: 5rem 0;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
+    <div>
+      <UploadDropzone
+        options={options}
+        onUpdate={async ({ uploadedFiles }) => {
+          if (uploadedFiles.length !== 0) {
+            console.log("url:", uploadedFiles[0].fileUrl)
+            console.log("mime:", uploadedFiles[0].originalFile.mime)
+            if(uploadedFiles[0].originalFile.mime === "application/pdf"){
+              const text = await getPdfText(uploadedFiles[0].fileUrl)
+              console.log("text:", text)
+              // const result = await signContract(uploadedFiles[0].fileUrl, "bizzicole87@gmail.com", "collinsmwambazi88@gmail.com")
+              // console.log("Result:", result)
+            } else {
+            const contract = await fetchText(uploadedFiles[0].fileUrl)
+            console.log("contract:", contract)
+            const scanResult = scan(contract)
+            console.log(scanResult)
+          }
         }
-        footer {
-          width: 100%;
-          height: 100px;
-          border-top: 1px solid #eaeaea;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-        footer img {
-          margin-left: 0.5rem;
-        }
-        footer a {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          text-decoration: none;
-          color: inherit;
-        }
-        code {
-          background: #fafafa;
-          border-radius: 5px;
-          padding: 0.75rem;
-          font-size: 1.1rem;
-          font-family:
-            Menlo,
-            Monaco,
-            Lucida Console,
-            Liberation Mono,
-            DejaVu Sans Mono,
-            Bitstream Vera Sans Mono,
-            Courier New,
-            monospace;
-        }
-      `}</style>
-
-      <style jsx global>{`
-        html,
-        body {
-          padding: 0;
-          margin: 0;
-          font-family:
-            -apple-system,
-            BlinkMacSystemFont,
-            Segoe UI,
-            Roboto,
-            Oxygen,
-            Ubuntu,
-            Cantarell,
-            Fira Sans,
-            Droid Sans,
-            Helvetica Neue,
-            sans-serif;
-        }
-        * {
-          box-sizing: border-box;
-        }
-      `}</style>
+        }}
+        width="600px" 
+    height="250px"
+      />
     </div>
+  );
+}
+
+async function signContract(fileUrl, signerEmailAddress, initiatorEmailAddress) {
+  const url = 'https://api.hellosign.com/v3/signature_request/send';
+  const apiKey = process.env.NEXT_PUBLIC_sign;
+
+  let formData = new FormData();
+  formData.append('file_urls[0]', fileUrl);
+  formData.append('title', 'Document Signing');
+  formData.append('subject', 'Please Review And Sign The Document');
+  formData.append('message', 'Please Review And Sign The Document');
+  formData.append('signers[0][email_address]', signerEmailAddress);
+  formData.append('signers[0][name]', signerEmailAddress);
+  formData.append('signers[0][order]', '0');
+  formData.append('signers[1][email_address]', initiatorEmailAddress);
+  formData.append('signers[1][name]', initiatorEmailAddress);
+  formData.append('signers[1][order]', '1');
+  formData.append('metadata[custom_id]', '1234');
+  formData.append('metadata[custom_text]', 'NDA #9');
+  formData.append('signing_options[draw]', '1');
+  formData.append('signing_options[type]', '1');
+  formData.append('signing_options[upload]', '1');
+  formData.append('signing_options[phone]', '1');
+  formData.append('signing_options[default_type]', 'draw');
+  formData.append('field_options[date_format]', 'DD - MM - YYYY');
+  formData.append('test_mode', '1');
+
+  try {
+      const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+              'Authorization': 'Basic ' + btoa(apiKey + ':')
+          },
+          body: formData
+      });
+
+      if (!response.ok) {
+          throw new Error('Network response was not ok' + response.statusText);
+      }
+      
+      const data = await response.json();
+      console.log(data);
+
+  } catch (error) {
+      console.error('There was a problem with the fetch operation:', error);
+  }
+}
+
+
+
+
+
+
+
+function SignContractButton({ fileUrl, initiatorEmail, signerEmail }) { 
+  return (
+      <button onClick={() => signContract(fileUrl, initiatorEmail, signerEmail)} >
+          Sign contract
+      </button>
+  );
+}
+
+
+  return (
+    <>
+    <Header />
+    <div className={styles.container}>
+      <AudioUploader />
+      {advice && (
+            <>
+              <div>
+              <h2 >Analysis ✍🏾</h2>
+              <p>{advice}</p>
+              </div>
+
+              <div>
+              <label>
+                First Signer email address: 
+                <input 
+                    name="first signer email address" 
+                    value={initiatorEmail}
+                    onChange={(e) => setInitiatorEmail(e.target.value)}
+                />
+            </label> <br />
+            
+
+            <label>
+                Second Signer email address: 
+                <input 
+                    name="second signer email address" 
+                    value={signerEmail}
+                    onChange={(e) => setSignerEmail(e.target.value)}
+                />
+            </label>
+            </div>
+            <br />
+              <SignContractButton fileUrl={link} initiatorEmail={initiatorEmail} signerEmail={signerEmail}/>
+
+            </>
+          )}
+      {loading && (
+            <h1>Loading ...</h1>
+          )}
+    </div>
+    <Footer />
+    </>
   );
 }

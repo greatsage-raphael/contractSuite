@@ -1,5 +1,5 @@
 .container {
-  min-height: 100vh;
+  min-height: 78vh;
   padding: 0 0.5rem;
   display: flex;
   flex-direction: column;
@@ -89,4 +89,104 @@
     width: 100%;
     flex-direction: column;
   }
+}
+
+.navbar {
+  font-family: sans-serif;
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  width: 100%;
+  height: 2rem;
+  border-bottom: 1px solid #D1D5DB; /* border-gray-300 */
+}
+
+.leftNav {
+  display: flex;
+  gap: 1rem;
+  font-weight: bold;
+  font-size: 1.5rem; /* text-2xl */
+}
+
+.logoLink {
+  text-decoration: none;
+  color: #2D3748; /* text-grey-darkest */
+}
+
+.logoLink:hover {
+  color: #4299E1; /* text-blue-700 */
+}
+
+.rightNav {
+  font-weight: bold;
+  font-size: 1rem; /* text-1xl */
+}
+
+.rightNav:hover {
+  color: #4299E1; /* text-blue-700 */
+}
+
+.externalLink {
+  display: flex;
+  align-items: center;
+}
+
+.externalLink:hover {
+  opacity: 0.5;
+}
+
+.linkText {
+  display: none;
+  /* For small (sm) screens and above */
+  @media (min-width: 640px) {
+      display: flex;
+  }
+}
+
+.externalIcon {
+  margin-left: 0.25rem; /* ml-1 */
+}
+
+
+.footer {
+  display: flex;
+  height: 50px;
+  width: 100%;
+  padding-top: 1rem; 
+  border-top: 2px solid #D1D5DB; /* border-gray-300 */
+  padding: 0.5rem 2rem; /* py-2, px-8 */
+  align-items: center;
+  justify-content: center; /* default for small screens */
+}
+
+.footerText:hover {
+  color: #2D3748; /* A darker gray. Adjust color to fit your design */
+}
+
+
+@media (min-width: 640px) {
+  .footer {
+      justify-content: space-between;
+  }
+}
+
+.footerText {
+  color: #4A5568; /* Adjust the color as per your design */
+  font-size: 1rem; /* Example font size, adjust as needed */
+  text-decoration: none; /* Removes underlining from the link */
+}
+
+
+.socialIcons {
+  display: flex;
+  gap: 1rem; /* space-x-4 */
+}
+
+.iconLink {
+  display: flex;
+  align-items: center;
+}
+
+.iconLink:hover {
+  opacity: 0.5; /* hover:opacity-50 */
 }
