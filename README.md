@@ -18,12 +18,12 @@ It uses gpt3.5 turbo api on [Open_AI](https://platform.openai.com/) to analyze a
 2.The second Signer of the contract
 
 ## Running Locally
- You can git clone from [this](https://github.com/greatsage-raphael/audioScripter).
+ You can git clone from [this](https://github.com/greatsage-raphael/contractSuite).
 
 ### Cloning the repository the local machine.
 
 ```bash
-git clone
+git clone https://github.com/greatsage-raphael/contractSuite
 ```
 
 ### Creating a account on Replicate to get an API key.
