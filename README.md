@@ -49,7 +49,7 @@ ContractSuite is a modern web application designed to streamline contract manage
 1. Clone the repository:
 ```bash
 git clone [repository-url]
-cd contractsuite/frontend
+cd contractsuite
 ```
 
 2. Install dependencies:
